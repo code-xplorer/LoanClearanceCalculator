@@ -7,18 +7,20 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.IntrinsicSize
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.FlowRow
+import androidx.compose.foundation.layout.FlowRowScope
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.widthIn
+import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.KeyboardArrowDown
@@ -41,7 +43,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import kotlin.math.roundToInt
 
 @Composable
 fun LoanStatement(modifier: Modifier = Modifier, loanData: LoanData, onEdit: () -> Unit) {
@@ -70,6 +71,7 @@ fun LoanStatement(modifier: Modifier = Modifier, loanData: LoanData, onEdit: () 
 
 }
 
+@OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun PaymentDetail(
     paymentSchedule: PaymentSchedule,
@@ -102,15 +104,17 @@ fun PaymentDetail(
                         horizontalArrangement = Arrangement.SpaceBetween,
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        Text(text = "${index + 1}", fontSize = 14.sp, modifier = Modifier
-                            .width(35.dp)
-                            .background(
-                                MaterialTheme.colorScheme.primaryContainer,
-                                MaterialTheme.shapes.small
-                            )
-                            .padding(4.dp),
+                        Text(
+                            text = "${index + 1}", fontSize = 14.sp, modifier = Modifier
+                                .width(35.dp)
+                                .background(
+                                    MaterialTheme.colorScheme.primaryContainer,
+                                    MaterialTheme.shapes.small
+                                )
+                                .padding(4.dp),
                             color = MaterialTheme.colorScheme.primary,
-                            textAlign = TextAlign.Center)
+                            textAlign = TextAlign.Center
+                        )
                         Text(
                             fontSize = 14.sp,
                             text = paymentItem.month.toString()
@@ -124,98 +128,70 @@ fun PaymentDetail(
                             contentDescription = "Skipped"
                         )
                     }
-                    Spacer(modifier = Modifier.height(0.5.dp).fillMaxWidth().background(Color.LightGray))
+                    Spacer(
+                        modifier = Modifier
+                            .height(0.5.dp)
+                            .fillMaxWidth()
+                            .background(Color.LightGray)
+                    )
 
-                    Row(
+                    FlowRow(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .height(IntrinsicSize.Max),
-                        verticalAlignment = Alignment.Top
+                            .wrapContentHeight()
+                            .padding(12.dp),
+                        horizontalArrangement = Arrangement.spacedBy(16.dp),
+                        verticalArrangement = Arrangement.spacedBy(16.dp)
                     ) {
-                        Column(
-                            modifier = Modifier
-                                .weight(1f)
-                                .fillMaxHeight()
-                                .padding(16.dp, 8.dp, 4.dp, 8.dp)
-                        ) {
-                            PaymentComponent(title = "EMI", value = paymentItem.emi.currencyFormat)
-                            Spacer(modifier = Modifier.height(10.dp))
-                            Row(
-                                modifier = Modifier.fillMaxWidth(),
-                                horizontalArrangement = Arrangement.SpaceBetween,
-                                verticalAlignment = Alignment.CenterVertically
-                            ) {
-                                PaymentComponent(
-                                    title = "Prepayment",
-                                    value = paymentItem.prepayment.currencyFormat
-                                )
-
-                                Column {
-                                    Image(
-                                        modifier = if (paymentItem.month.prepayment < paymentItem.month.maxPrepayment) Modifier.clickable {
-                                            updateSpecialMonths(buildList {
-                                                addAll(specialMonths.filter {
-                                                    !it.sameDate(
-                                                        paymentItem.month
-                                                    )
-                                                })
-                                                paymentItem.month.prepayment += 10000.0
-                                                add(paymentItem.month)
-                                            })
-                                        } else Modifier,
-                                        imageVector = Icons.Filled.KeyboardArrowUp,
-                                        colorFilter = if (paymentItem.month.prepayment < paymentItem.month.maxPrepayment) ColorFilter.tint(
-                                            Color.Black
-                                        ) else ColorFilter.tint(Color.LightGray),
-                                        contentDescription = "Up"
-                                    )
-                                    Image(
-                                        modifier = if (paymentItem.month.prepayment > 0) Modifier.clickable {
-                                            updateSpecialMonths(buildList {
-                                                addAll(specialMonths.filter {
-                                                    !it.sameDate(
-                                                        paymentItem.month
-                                                    )
-                                                })
-                                                val intPrepayment = paymentItem.month.prepayment.toInt()
-                                                if(intPrepayment % 10000 == 0) {
-                                                    paymentItem.month.prepayment -= 10000.0
-                                                } else {
-                                                    paymentItem.month.prepayment = (intPrepayment - intPrepayment % 10000).toDouble()
-                                                }
-                                                add(paymentItem.month)
-                                            })
-                                        } else Modifier,
-                                        imageVector = Icons.Filled.KeyboardArrowDown,
-                                        colorFilter = if (paymentItem.month.prepayment > 0) ColorFilter.tint(
-                                            Color.Black
-                                        ) else ColorFilter.tint(Color.LightGray),
-                                        contentDescription = "Down"
-                                    )
-                                }
+                        PaymentComponent(
+                            title = "EMI",
+                            value = paymentItem.emi.currencyFormat
+                        )
+                        PaymentComponent(
+                            title = "Interest",
+                            value = paymentItem.interest.currencyFormat
+                        )
+                        PaymentComponent(
+                            title = "Prepayment",
+                            value = paymentItem.prepayment.currencyFormat,
+                            shouldShowArrowButtons = true,
+                            arrowUpEnabled = paymentItem.month.prepayment < paymentItem.month.maxPrepayment,
+                            arrowDownEnabled = paymentItem.month.prepayment > 0,
+                            onArrowUpClicked = {
+                                updateSpecialMonths(buildList {
+                                    addAll(specialMonths.filter {
+                                        !it.sameDate(
+                                            paymentItem.month
+                                        )
+                                    })
+                                    paymentItem.month.prepayment += 10000.0
+                                    add(paymentItem.month)
+                                })
+                            },
+                            onArrowDownClicked = {
+                                updateSpecialMonths(buildList {
+                                    addAll(specialMonths.filter {
+                                        !it.sameDate(
+                                            paymentItem.month
+                                        )
+                                    })
+                                    val intPrepayment = paymentItem.month.prepayment.toInt()
+                                    if (intPrepayment % 10000 == 0) {
+                                        paymentItem.month.prepayment -= 10000.0
+                                    } else {
+                                        paymentItem.month.prepayment =
+                                            (intPrepayment - intPrepayment % 10000).toDouble()
+                                    }
+                                    add(paymentItem.month)
+                                })
                             }
-                        }
-                        Column(
-                            modifier = Modifier
-                                .weight(1f)
-                                .fillMaxHeight()
-                                .padding(4.dp, 12.dp, 8.dp, 12.dp)
-                        ) {
-                            PaymentComponent(
-                                title = "Interest",
-                                value = paymentItem.interest.currencyFormat
-                            )
-
-                            Spacer(modifier = Modifier.height(10.dp))
-
-                            PaymentComponent(
-                                title = "Total Paid",
-                                value = paymentItem.totalPaid.currencyFormat
-                            )
-                        }
+                        )
+                        PaymentComponent(
+                            title = "Total Paid",
+                            value = paymentItem.totalPaid.currencyFormat
+                        )
                     }
                 }
-
 
             }
             Spacer(modifier = Modifier.height(8.dp))
@@ -223,19 +199,59 @@ fun PaymentDetail(
     }
 }
 
+@OptIn(ExperimentalLayoutApi::class)
 @Composable
-fun PaymentComponent(title: String, value: String) {
-    Column {
-        Text(
-            text = title,
-            fontSize = 12.sp,
-            color = Color.Gray
-        )
+fun FlowRowScope.PaymentComponent(
+    title: String,
+    value: String,
+    shouldShowArrowButtons: Boolean = false,
+    onArrowUpClicked: () -> Unit = {},
+    onArrowDownClicked: () -> Unit = {},
+    arrowUpEnabled: Boolean = false,
+    arrowDownEnabled: Boolean = false
+) {
+    Row(
+        modifier = Modifier.weight(1f, fill = true) // Equal spacing between items
+            .widthIn(min = 100.dp, max = 120.dp),
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Column {
+            Text(
+                text = title,
+                fontSize = 12.sp,
+                color = Color.Gray
+            )
 
-        Text(
-            text = value,
-            fontSize = 14.sp
-        )
+            Text(
+                text = value,
+                fontSize = 14.sp
+            )
+        }
+        if (shouldShowArrowButtons) {
+            Column {
+                Image(
+                    modifier = if (arrowUpEnabled) Modifier.clickable {
+                        onArrowUpClicked()
+                    } else Modifier,
+                    imageVector = Icons.Filled.KeyboardArrowUp,
+                    colorFilter = ColorFilter.tint(
+                        if (arrowUpEnabled) Color.Black else Color.LightGray
+                    ),
+                    contentDescription = "Up"
+                )
+                Image(
+                    modifier = if (arrowDownEnabled) Modifier.clickable {
+                        onArrowDownClicked()
+                    } else Modifier,
+                    imageVector = Icons.Filled.KeyboardArrowDown,
+                    colorFilter = ColorFilter.tint(
+                        if (arrowDownEnabled) Color.Black else Color.LightGray
+                    ),
+                    contentDescription = "Down"
+                )
+            }
+        }
     }
 }
 
