@@ -19,6 +19,7 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Done
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
@@ -42,6 +43,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import java.util.Locale
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun LoanFormScreen(
     modifier: Modifier = Modifier,
@@ -80,7 +82,6 @@ fun LoanFormScreen(
         Column(
             modifier = modifier
                 .fillMaxSize()
-                .background(Color(0xFFF5F5F5))
                 .verticalScroll(scrollState)
         ) {
             Text(
@@ -100,9 +101,7 @@ fun LoanFormScreen(
                 OutlinedTextField(
                     modifier = Modifier.fillMaxWidth(),
                     maxLines = 1,
-                    colors = TextFieldDefaults.colors(
-                        unfocusedContainerColor = Color.White,
-                        focusedContainerColor = Color.White,
+                    colors = TextFieldDefaults.outlinedTextFieldColors(
                         unfocusedLeadingIconColor = Color.Gray,
                         focusedLeadingIconColor = Color.Black
                     ),
@@ -121,9 +120,7 @@ fun LoanFormScreen(
                 OutlinedTextField(
                     modifier = Modifier.fillMaxWidth(),
                     maxLines = 1,
-                    colors = TextFieldDefaults.colors(
-                        unfocusedContainerColor = Color.White,
-                        focusedContainerColor = Color.White,
+                    colors = TextFieldDefaults.outlinedTextFieldColors(
                         unfocusedTrailingIconColor = Color.Gray,
                         focusedTrailingIconColor = Color.Black
                     ),
@@ -142,9 +139,7 @@ fun LoanFormScreen(
                 OutlinedTextField(
                     modifier = Modifier.fillMaxWidth(),
                     maxLines = 1,
-                    colors = TextFieldDefaults.colors(
-                        unfocusedContainerColor = Color.White,
-                        focusedContainerColor = Color.White,
+                    colors = TextFieldDefaults.outlinedTextFieldColors(
                         unfocusedLeadingIconColor = Color.Gray,
                         focusedLeadingIconColor = Color.Black
                     ),
@@ -163,9 +158,7 @@ fun LoanFormScreen(
                 OutlinedTextField(
                     modifier = Modifier.fillMaxWidth(),
                     maxLines = 1,
-                    colors = TextFieldDefaults.colors(
-                        unfocusedContainerColor = Color.White,
-                        focusedContainerColor = Color.White,
+                    colors = TextFieldDefaults.outlinedTextFieldColors(
                         unfocusedLeadingIconColor = Color.Gray,
                         focusedLeadingIconColor = Color.Black
                     ),
